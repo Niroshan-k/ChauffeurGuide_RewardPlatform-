@@ -62,6 +62,7 @@ class Guide extends Model
     // Points left = earned - redeemed
     public function pointsRemaining()
     {
-        return $this->totalPoints() - $this->pointsRedeemed();
+        $redemption = $this->redemptions()->first();
+        return $redemption ? $redemption->points : 0;
     }
 }

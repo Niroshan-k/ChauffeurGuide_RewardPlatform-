@@ -11,29 +11,48 @@ use Carbon\Carbon;
 
 class RedemptionController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, $guide_id)
     {
         $request->validate([
-            'guide_id' => 'required|exists:guides,id',
             'points' => 'required|integer|min:1',
         ]);
 
-        $guide = Guide::findOrFail($request->guide_id);
+        $guide = Guide::findOrFail($guide_id);
         $remaining = $guide->pointsRemaining();
 
-        if ($request->points > $remaining) {
-            return response()->json(['message' => 'Not enough points.'], 400);
+        // Calculate the maximum redeemable points (must leave at least 10)
+        $maxRedeemable = max($remaining - 10, 0);
+
+        if ($maxRedeemable <= 0) {
+            return response()->json([
+                'message' => "You need at least 11 points to redeem. You currently have only $remaining points."
+            ], 400);
         }
 
-        $redemption = Redemption::create([
-            'guide_id' => $guide->id,
-            'points' => $request->points,
-            'redeemed_at' => Carbon::now(),
+        if ($request->points > $maxRedeemable) {
+            return response()->json([
+                'message' => "You only have $remaining points. You can redeem up to $maxRedeemable points."
+            ], 400);
+        }
+
+        // Update the existing redemption row for this guide
+        $redemption = $guide->redemptions()->first();
+        if ($redemption) {
+            $redemption->points -= $request->points;
+            $redemption->redeemed_at = Carbon::now();
+            $redemption->save();
+        } else {
+            // If no row exists, create one (should only happen for new guides)
+            $redemption = $guide->redemptions()->create([
+                'points' => 0,
+                'redeemed_at' => Carbon::now(),
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Points redeemed.',
+            'redemption' => $redemption
         ]);
-
-        // TODO: Send WhatsApp notification to admin and guide
-
-        return response()->json(['message' => 'Points redeemed.', 'redemption' => $redemption]);
     }
 
     public function history($guideId)

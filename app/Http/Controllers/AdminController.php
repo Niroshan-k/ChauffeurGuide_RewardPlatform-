@@ -19,7 +19,22 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:admins,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $admin = \App\Models\Admin::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+
+        return response()->json([
+            'message' => 'Admin created successfully',
+            'admin' => $admin,
+        ], 201);
     }
 
     /**

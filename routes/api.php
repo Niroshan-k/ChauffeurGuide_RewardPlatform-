@@ -6,9 +6,14 @@ use App\Http\Controllers\GuideController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RedemptionController;
+use App\Http\Controllers\VisitController;
 
 // --- Public routes (no auth needed) ---
 
+// filepath: /Applications/XAMPP/xamppfiles/htdocs/ChauffeurGuide_RewardPlatform/routes/api.php
+Route::get('/test', function () {
+    return 'test';
+});
 // Guide login
 Route::post('/guide/login', [AuthController::class, 'guideLogin']);
 
@@ -22,7 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/guide/dashboard', [GuideController::class, 'dashboard']);
 
     // Redeem points
-    Route::post('/guide/redeem', [RedemptionController::class, 'redeemPoints']);
+    Route::post('/guide/{guide_id}/redeem', [RedemptionController::class, 'store']);
 });
 
 
@@ -30,12 +35,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
 
     // Admin guide management
-    Route::post('/admin/guides', [AdminController::class, 'store']);
-    Route::put('/admin/guides/{id}', [AdminController::class, 'update']);
-    Route::delete('/admin/guides/{id}', [AdminController::class, 'destroy']);
-    Route::get('/admin/guides', [AdminController::class, 'index']);
-    Route::get('/admin/guides/{id}', [AdminController::class, 'show']);
+    Route::post('/admin/guides', [GuideController::class, 'store']);
+    Route::put('/admin/guides/{id}', [GuideController::class, 'update']);
+    Route::delete('/admin/guides/{id}', [GuideController::class, 'destroy']);
+    Route::get('/admin/guides', [GuideController::class, 'index']);
+    Route::get('/admin/guides/{id}', [GuideController::class, 'show']);
+    Route::post('admin/visits', [VisitController::class, 'store']);
 
     // Admin updates visit and tourist count
     Route::post('/admin/guides/{id}/update-activity', [AdminController::class, 'updateActivity']);
 });
+
+
+// --- Public route to create an admin ---
+// Route::post('/admin/register', [AdminController::class, 'store']);

@@ -16,15 +16,14 @@ class AuthController extends Controller
     public function guideLogin(Request $request)
     {
         $request->validate([
-            'mobile' => 'required|string',
-            'password' => 'required|string',
+            'mobile_number' => 'required|string',
         ]);
 
-        $guide = Guide::where('mobile', $request->mobile)->first();
+        $guide = Guide::where('mobile_number', $request->mobile_number)->first();
 
-        if (! $guide || ! Hash::check($request->password, $guide->password)) {
+        if (! $guide) {
             throw ValidationException::withMessages([
-                'mobile' => ['The provided credentials are incorrect.'],
+                'mobile_number' => ['The provided mobile number is incorrect.'],
             ]);
         }
 

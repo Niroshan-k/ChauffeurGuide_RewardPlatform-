@@ -44,6 +44,30 @@ class GuideController extends Controller
         return Guide::with('visits', 'redemptions')->findOrFail($id);
     }
 
+    public function update(Request $request, $id)
+    {
+        $guide = Guide::findOrFail($id);
+
+        $request->validate([
+            'full_name' => 'sometimes|required|string|max:255',
+            'mobile_number' => 'sometimes|required|string|unique:guides,mobile_number,' . $guide->id,
+            'date_of_birth' => 'nullable|date',
+            'email' => 'nullable|email',
+            'whatsapp_number' => 'nullable|string',
+            'profile_photo' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('profile_photo')) {
+            $data['profile_photo'] = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
+
+        $guide->update($data);
+
+        return response()->json(['message' => 'Guide updated successfully.', 'guide' => $guide]);
+    }
+
     public function destroy($id)
     {
         $guide = Guide::findOrFail($id);

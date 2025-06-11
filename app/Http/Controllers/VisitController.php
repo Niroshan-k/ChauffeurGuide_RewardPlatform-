@@ -19,7 +19,26 @@ class VisitController extends Controller
 
         $visit = Visit::create($request->all());
 
-        return response()->json(['message' => 'Visit added.', 'visit' => $visit]);
+        // Calculate points
+        $visitPoints = 10;
+        $paxPoints = $request->pax_count * 5;
+        $totalPoints = $visitPoints + $paxPoints;
+
+        // Find or create redemption for this guide
+        $redemption = \App\Models\Redemption::firstOrCreate(
+            ['guide_id' => $request->guide_id],
+            ['points' => 0]
+        );
+
+        // Update points
+        $redemption->points += $totalPoints;
+        $redemption->save();
+
+        return response()->json([
+            'message' => 'Visit added.',
+            'visit' => $visit,
+            'redemption' => $redemption
+        ]);
     }
 
     public function update(Request $request, $id)
