@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Guide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Twilio\Rest\Client;
 
 class GuideController extends Controller
 {
@@ -29,7 +30,19 @@ class GuideController extends Controller
 
         $guide = Guide::create($data);
 
-        // TODO: Send WhatsApp welcome message + app links here
+        // Send WhatsApp welcome message
+        // try {
+        //     $twilio = new Client(env('TWILIO_SID'), env('TWILIO_AUTH_TOKEN'));
+        //     $twilio->messages->create(
+        //         'whatsapp:' . $guide->mobile_number, // recipient in international format
+        //         [
+        //             'from' => env('TWILIO_WHATSAPP_FROM'),
+        //             'body' => "Welcome to Chauffeur Guide! Download our app here: https://your-app-link.com"
+        //         ]
+        //     );
+        // } catch (\Exception $e) {
+        //     // Optionally log or handle the error
+        // }
 
         return response()->json(['message' => 'Guide registered successfully.', 'guide' => $guide]);
     }

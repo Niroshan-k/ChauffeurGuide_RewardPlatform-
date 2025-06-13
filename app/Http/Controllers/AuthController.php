@@ -29,6 +29,9 @@ class AuthController extends Controller
 
         $token = $guide->createToken('guide-token')->plainTextToken;
 
+         // Save the token in the session
+        $request->session()->put('admin_token', $token);
+        
         return response()->json([
             'user' => $guide,
             'token' => $token,

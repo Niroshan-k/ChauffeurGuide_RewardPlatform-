@@ -32,20 +32,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 // --- Protected routes for admins ---
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
 
     // Admin guide management
     Route::post('/admin/guides', [GuideController::class, 'store']);
     Route::put('/admin/guides/{id}', [GuideController::class, 'update']);
     Route::delete('/admin/guides/{id}', [GuideController::class, 'destroy']);
+    Route::post('admin/visits', [VisitController::class, 'store']);
+
     Route::get('/admin/guides', [GuideController::class, 'index']);
     Route::get('/admin/guides/{id}', [GuideController::class, 'show']);
-    Route::post('admin/visits', [VisitController::class, 'store']);
+    
 
     // Admin updates visit and tourist count
     Route::post('/admin/guides/{id}/update-activity', [AdminController::class, 'updateActivity']);
 });
-
 
 // --- Public route to create an admin ---
 // Route::post('/admin/register', [AdminController::class, 'store']);

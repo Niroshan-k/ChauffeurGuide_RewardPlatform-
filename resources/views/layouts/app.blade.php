@@ -31,6 +31,7 @@
             <main>
                 {{ $slot }}
             </main>
+            <div id="app"></div>
         </div>
     </body>
 </html>
