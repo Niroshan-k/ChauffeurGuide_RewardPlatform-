@@ -13,10 +13,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/guide/redeem', [RedemptionController::class, 'redeem']);
 });
 
-
-Route::get('/admin/dashboard', function () { return view('admin.dashboard'); });
-Route::middleware(['auth:sanctum', 'is_admin'])->group(function () {
-    
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/admin/dashboard', function () { return view('admin.dashboard'); });
 });
 
 Route::get('/admin/login', function () {
